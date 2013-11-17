@@ -122,6 +122,12 @@ function addTab(props) {
 
 		}
 
+		$.trigger('tabs:focus', {
+            tab: tab,
+            index: _.indexOf(tabs, tab)
+        });
+
+
 	});
 
 	// add the tab to the view
