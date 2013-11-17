@@ -153,36 +153,24 @@ function open(subWindow) {
 			subWindow.modal = subWindow.modal || false;
 		} else {
 
-			if (!subWindow.leftNavButton) {
-				subWindow.leftNavButton = Ti.UI.createButton({
-					height : 38,
-					title : "back"
-				});
+            if (args.settings.tabsAtBottom) {
+                    subWindow.applyProperties({
+                            top : 0,
+                            bottom : args.settings.tabHeight
+                    });
+            } else {
+                    subWindow.applyProperties({
+                            top : args.settings.tabHeight,
+                            bottom : 0
+                    });
+            }
+            
+            // instead of adding a button, use the native back-button
+            subWindow.addEventListener('androidback', androidback);       
+            subWins.push(subWindow);
+		}
 
-				subWindow.leftNavButton.applyProperties({
-					top : subWindow.leftNavButton.top || 5,
-					left : subWindow.leftNavButton.left || 5,
-					height : subWindow.leftNavButton.height || 38,
-					width : subWindow.leftNavButton.width || 75
-				});
-
-				subWindow.add(subWindow.leftNavButton);
-			}
-
-			// Back Button
-			subWindow.leftNavButton.addEventListener("click", function() {
-				close(subWindow);
-			});
-
-			subWindow.addEventListener('androidback', function() {
-				close(subWindow);
-			});
-
-			subWindow.leftNavButton.visible = true;
-
-			subWins.push(subWindow);
-
-			subWindow.open();
+		subWindow.open();
 
 		}
 
@@ -195,25 +183,29 @@ function close(subWindow) {
 
 	if (OS_IOS) {
 
-		args.win.__navGroup.closeWindow(subWindow);
+		args.win.__navGroup.close(subWindow);
 
 	} else if (OS_ANDROID) {
 
 		if (args.settings.lightWeightMode) {
-			var currentWin = subWins[subWins.length - 1];
+			subWindow.removeEventListener('androidback', androidback);
 
-			currentWin.close();
 			subWins.pop();
 
-		} else {
-			subWindow.close();
 		}
+
+		subWindow.close();
+		subWindow = null;
 
 	} else {
 
 		subWindow.close();
 
 	}
+}
+
+function androidback(e){
+    close(e.source);
 }
 
 exports.setInactive = setInactive;
