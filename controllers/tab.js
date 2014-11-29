@@ -172,8 +172,6 @@ function open(subWindow) {
 
 		subWindow.open();
 
-		}
-
 	} else {
 		subWindow.open();
 	}
